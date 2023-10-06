@@ -1,0 +1,77 @@
+name: Node.js Test and Docker Build
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+
+  build:
+    name: "Docker Build"
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ap-south-1
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-duration-seconds: 1200
+          mask-aws-account-id: false
+
+      - name: Login to ECR
+        uses: docker/login-action@v1.10.0
+        with:
+          registry: 027187086770.dkr.ecr.ap-south-1.amazonaws.com
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: 027187086770.dkr.ecr.ap-south-1.amazonaws.com/onprem-react-cicd:${{ github.sha }}
+
+  # deploy:
+  #   needs:
+  #     - build
+  #   name: "ECS Deploy"
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+
+  #   steps:
+  #     - name: Copy all files
+  #       uses: actions/checkout@v3
+
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-region: ap-south-1
+  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN}}
+  #         role-duration-seconds: 1200
+  #         mask-aws-account-id: false
+
+  #     - name: Render Amazon ECS task definition
+  #       id: render-web-container
+  #       uses: aws-actions/amazon-ecs-render-task-definition@v1
+  #       with:
+  #         task-definition: task-definition.json
+  #         container-name: cicd-practice-container
+  #         image: 027187086770.dkr.ecr.ap-south-1.amazonaws.com/cicd-deploy-ecs:${{ github.sha }}
+  #         environment-variables: "LOG_LEVEL=info"
+
+  #     - name: Deploy to Amazon ECS service
+  #       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+  #       with:
+  #         task-definition: ${{ steps.render-web-container.outputs.task-definition }}
+  #         service: cicd-practice
+  #         cluster: DemoCluster
