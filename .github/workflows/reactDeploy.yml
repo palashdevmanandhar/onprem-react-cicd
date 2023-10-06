@@ -47,10 +47,23 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Install OpenSSH Client
+        run: sudo apt-get install openssh-client
+
       - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.LIS_WORKER_SERVER_SSH }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LIS_WORKER_SERVER_SSH }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 192.168.50.255 >> ~/.ssh/known_hosts
+
+      - name: Debug SSH Key
+        run: |
+          echo "Contents of id_rsa:"
+          cat ~/.ssh/id_rsa
+
+          echo "Contents of known_hosts:"
+          cat ~/.ssh/known_hosts
 
       - name: SSH into Server and Create Directory
         run: |
