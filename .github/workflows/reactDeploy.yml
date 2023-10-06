@@ -55,4 +55,4 @@ jobs:
 
       - name: Deploy with rsync
         run: |
-          ssh ${{ secrets.USER_IP }} "mkdir -p /home/palashdm2/my-new-directory"
+          ssh palashdm2@192.168.50.247 "mkdir -p /home/palashdm2/my-new-directory"
