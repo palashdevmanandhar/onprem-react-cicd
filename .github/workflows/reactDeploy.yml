@@ -39,39 +39,20 @@ jobs:
           push: true
           tags: 027187086770.dkr.ecr.ap-south-1.amazonaws.com/onprem-react-cicd:${{ github.sha }}
 
-  # deploy:
-  #   needs:
-  #     - build
-  #   name: "ECS Deploy"
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     id-token: write
-  #     contents: read
+  deploy:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Copy all files
-  #       uses: actions/checkout@v3
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-  #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-region: ap-south-1
-  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN}}
-  #         role-duration-seconds: 1200
-  #         mask-aws-account-id: false
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$LIS_WORKER_SERVER_SSH" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa your_onprem_server >> ~/.ssh/known_hosts
 
-  #     - name: Render Amazon ECS task definition
-  #       id: render-web-container
-  #       uses: aws-actions/amazon-ecs-render-task-definition@v1
-  #       with:
-  #         task-definition: task-definition.json
-  #         container-name: cicd-practice-container
-  #         image: 027187086770.dkr.ecr.ap-south-1.amazonaws.com/cicd-deploy-ecs:${{ github.sha }}
-  #         environment-variables: "LOG_LEVEL=info"
-
-  #     - name: Deploy to Amazon ECS service
-  #       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-  #       with:
-  #         task-definition: ${{ steps.render-web-container.outputs.task-definition }}
-  #         service: cicd-practice
-  #         cluster: DemoCluster
+      - name: Deploy to On-Premises Server
+        run: |
+          ssh palashdm2@192.168.50.255 "cd /home/palashdm2 && mkdir newTestDir"
