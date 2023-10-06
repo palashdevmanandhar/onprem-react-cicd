@@ -6,62 +6,52 @@ on:
 
 jobs:
 
-  build:
-    name: "Docker Build"
-    runs-on: ubuntu-latest
+  # build:
+  #   name: "Docker Build"
+  #   runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: read
+  #   permissions:
+  #     id-token: write
+  #     contents: read
 
-    steps:
-      - uses: actions/checkout@v3
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v2
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: ap-south-1
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-duration-seconds: 1200
-          mask-aws-account-id: false
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-region: ap-south-1
+  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+  #         role-duration-seconds: 1200
+  #         mask-aws-account-id: false
 
-      - name: Login to ECR
-        uses: docker/login-action@v1.10.0
-        with:
-          registry: 027187086770.dkr.ecr.ap-south-1.amazonaws.com
+  #     - name: Login to ECR
+  #       uses: docker/login-action@v1.10.0
+  #       with:
+  #         registry: 027187086770.dkr.ecr.ap-south-1.amazonaws.com
 
-      - name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          tags: 027187086770.dkr.ecr.ap-south-1.amazonaws.com/onprem-react-cicd:${{ github.sha }}
+  #     - name: Build and push
+  #       uses: docker/build-push-action@v3
+  #       with:
+  #         push: true
+  #         tags: 027187086770.dkr.ecr.ap-south-1.amazonaws.com/onprem-react-cicd:${{ github.sha }}
 
   deploy:
-    name: "Deploy to Worker Server"
+    name: "Deploy to worker server"
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout 🛎
-        uses: actions/checkout@master
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.LIS_WORKER_SERVER_SSH }}
+
+      - name: SSH into Server and Create Directory
         run: |
-          mkdir -p ~/.ssh/
-          echo "${{ secrets.LIS_WORKER_SERVER_SSH }}" > ~/.ssh/id_rsa.pub
-          chmod 600 ~/.ssh/id_rsa.pub
-          ssh-keyscan -H 192.168.50.255 >> ~/.ssh/known_hosts
-
-          # Add debugging statements
-          echo "Contents of id_rsa:"
-          cat ~/.ssh/id_rsa.pub
-
-          echo "Contents of known_hosts:"
-          cat ~/.ssh/known_hosts
-
-          ls -l ~/.ssh/
-      
-      - name: Copy builds to server
-        run: |
-          ssh ${{ secrets.LIS_WORKER_SERVER_SSH }} "cd /home/palashdm2/ && mkdir TestingDeployment"
+          ssh ${{ secrets.USER_IP }} 'mkdir /home/palashdm2/TestDirectory'
