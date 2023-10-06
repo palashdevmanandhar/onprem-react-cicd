@@ -49,10 +49,5 @@ jobs:
         with:
           key: ${{ secrets.LIS_WORKER_SERVER_PRIVATE_KEY }}
           known_hosts: ${{ secrets.SSH_HOST }}
-
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy with rsync
-        run: |
-          ssh palashdm2@192.168.50.247 "mkdir -p /home/palashdm2/my-new-directory"
+      - name: Pull
+        run: ssh palashdm2@192.168.50.247 "mkdir -p /home/palashdm2/my-new-directory"
