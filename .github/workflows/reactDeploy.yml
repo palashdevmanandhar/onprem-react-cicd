@@ -55,7 +55,7 @@ jobs:
 
           # Add debugging statements
           echo "Contents of id_rsa:"
-          cat ~/.ssh/id_rsa
+          cat ~/.ssh/id_rsa.pub
 
           echo "Contents of known_hosts:"
           cat ~/.ssh/known_hosts
