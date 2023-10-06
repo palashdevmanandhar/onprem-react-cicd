@@ -40,19 +40,20 @@ jobs:
           tags: 027187086770.dkr.ecr.ap-south-1.amazonaws.com/onprem-react-cicd:${{ github.sha }}
 
   deploy:
+    name: "Deploy to Worker Server"
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+      - name: Checkout 🛎
+        uses: actions/checkout@master
 
       - name: Setup SSH
         run: |
-          mkdir -p ~/.ssh
-          echo "$LIS_WORKER_SERVER_SSH" > ~/.ssh/id_rsa
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.LIS_WORKER_SERVER_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.LIS_WORKER_SERVER_SSH }}" > ~/.ssh/id_rsa.pub
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa your_onprem_server >> ~/.ssh/known_hosts
-
-      - name: Deploy to On-Premises Server
+          chmod 600 ~/.ssh/id_rsa.pub
+          ssh-keyscan -H 192.168.50.255 >> ~/.ssh/known_hosts
+      - name: copy builds to server
         run: |
-          ssh palashdm2@192.168.50.255 "cd /home/palashdm2 && mkdir newTestDir"
+          ssh ${{ secrets.LIS_WORKER_SERVER_SSH }} "cd /home/palashdm2/ && mkdir TestingDeployment"
