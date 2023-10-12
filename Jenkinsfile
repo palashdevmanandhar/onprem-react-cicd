@@ -8,19 +8,14 @@ pipeline {
     }
 
     stage('Log') {
-      parallel {
-        stage('Log') {
-          steps {
-            sh 'ls -la'
-          }
-        }
+      steps {
+        sh 'ls -la'
+      }
+    }
 
-        stage('Install and build') {
-          steps {
-            sh 'npm install && npm run build'
-          }
-        }
-
+    stage('Build') {
+      steps {
+        sh 'docker build -f ./Dockerfile .'
       }
     }
 
