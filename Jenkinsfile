@@ -25,6 +25,12 @@ pipeline {
       }
     }
 
+    stage('Push to Dockerhub') {
+      steps {
+        sh 'docker push palashdm/onprem-react-cicd:latest'
+      }
+    }
+
   }
   environment {
     DOCKERHUB_USER = 'palashdm'
