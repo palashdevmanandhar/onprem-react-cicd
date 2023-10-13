@@ -13,15 +13,9 @@ pipeline {
       }
     }
 
-    stage('Switch User') {
-      steps {
-        sh 'echo "9849" | su - "palashdm2"'
-      }
-    }
-
     stage('Build Docker Image') {
       steps {
-        sh 'docker build -f ./Dockerfile .'
+        sh 'echo "9849" | su - "root" -c "docker build -f ./Dockerfile ."'
       }
     }
 
