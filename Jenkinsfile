@@ -24,7 +24,7 @@ pipeline {
       }
     }
 
-    stage('') {
+    stage('Docker Image Build') {
       steps {
         sh 'docker build -f Dockerfile .'
       }
