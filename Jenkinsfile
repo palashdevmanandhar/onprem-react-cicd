@@ -15,7 +15,7 @@ pipeline {
 
     stage('Switch User') {
       steps {
-        sh 'echo "9849" | su -c "sudo su" "palashdm2"'
+        sh 'echo "9849" | su - "palashdm2"'
       }
     }
 
