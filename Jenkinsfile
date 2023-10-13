@@ -15,7 +15,7 @@ pipeline {
 
     stage('Switch User') {
       steps {
-        sh 'echo "9849" | su -c "commands_to_run_as_target_user" "palashdm2"'
+        sh 'echo "9849" | su -c "sudo su" "palashdm2"'
       }
     }
 
