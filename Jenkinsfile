@@ -15,7 +15,7 @@ pipeline {
 
     stage('Docker Image Build') {
       steps {
-        sh 'sudo docker build -f Dockerfile .'
+        sh 'sudo docker build -f Dockerfile . -t palashdm/onprem-react-cicd:latest'
       }
     }
 
