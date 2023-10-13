@@ -8,14 +8,19 @@ pipeline {
     }
 
     stage('Log') {
-      steps {
-        sh 'ls -la'
-      }
-    }
+      parallel {
+        stage('Log') {
+          steps {
+            sh 'ls -la'
+          }
+        }
 
-    stage('Build Docker Image') {
-      steps {
-        sh 'echo "9849" | su - "root" -c "docker build -f ./Dockerfile ."'
+        stage('Install packages') {
+          steps {
+            sh 'npm install'
+          }
+        }
+
       }
     }
 
