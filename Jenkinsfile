@@ -8,19 +8,8 @@ pipeline {
     }
 
     stage('Log') {
-      parallel {
-        stage('Log') {
-          steps {
-            sh 'ls -la'
-          }
-        }
-
-        stage('Install packages') {
-          steps {
-            sh 'npm install'
-          }
-        }
-
+      steps {
+        sh 'ls -la'
       }
     }
 
@@ -30,5 +19,15 @@ pipeline {
       }
     }
 
+    stage('Login to DockerHub') {
+      steps {
+        sh 'docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD'
+      }
+    }
+
+  }
+  environment {
+    DOCKERHUB_USER = 'palashdm'
+    DOCKERHUB_PASSWORD = 'Silicon18v@lley'
   }
 }
