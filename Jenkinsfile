@@ -33,7 +33,7 @@ pipeline {
                 
                 // sh "cat /home/palash.manandhar/.ssh/id_rsa.pub"
                 // sh "hostname"
-                sh "ssh ${remoteUser}@${remoteServer} 'cd /home/yco.user/react-deployment && sudo docker stop react_container_01 && sudo docker rm react_container_01 &&  sudo docker pull registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest && sudo docker run -d -p 3000:3000 registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'"
+                sh "ssh ${remoteUser}@${remoteServer} 'cd /home/yco.user/react-deployment && docker stop react_container_01 && docker rm react_container_01 &&  docker pull registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest && docker run -d --name react_container_01 -p 3000:3000 registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'"
             }
         }
 
