@@ -19,26 +19,23 @@ pipeline {
       }
     }
 
-    stage('Push to Dockerhub') {
+    stage('SSH into Remote Server') {
       steps {
-        sh 'docker push registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'
+        script {
+          def remoteServer = '192.168.50.181'
+          def remoteUser = 'yco.user'
+
+          // Check if the container exists before attempting to stop and remove
+          def containerExists = sh(script: "ssh ${remoteUser}@${remoteServer} 'docker ps -a --filter name=react_container_01 --format {{.Names}}'", returnStatus: true) == 0
+
+          if (containerExists) {
+            sh "ssh ${remoteUser}@${remoteServer} 'docker stop react_container_01 && docker rm react_container_01'"
+          }
+
+          // Pull the latest image and run the container
+          sh "ssh ${remoteUser}@${remoteServer} 'docker pull registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest && docker run -d --name react_container_01 -p 3000:3000 registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'"
+        }
       }
     }
-
-    stage('SSH into Remote Server') {
-        steps {
-            script {
-                def remoteServer = '192.168.50.181'
-                def remoteUser = 'yco.user'
-                
-                // sh "cat /home/palash.manandhar/.ssh/id_rsa.pub"
-                // sh "hostname"
-                sh "ssh ${remoteUser}@${remoteServer} 'cd /home/yco.user/react-deployment && docker stop react_container_01 && docker rm react_container_01 &&  docker pull registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest && docker run -d --name react_container_01 -p 3000:3000 registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'"
-            }
-        }
-
-      
-    }
-
   }
 }
