@@ -31,9 +31,9 @@ pipeline {
                 def remoteServer = '192.168.50.181'
                 def remoteUser = 'yco.user'
                 
-                sh "cat /home/palash.manandhar/.ssh/id_rsa.pub"
-                sh "hostname"
-                // sh "ssh ${remoteUser}@${remoteServer} 'cd /home/lisadmin/react-deployment && sudo docker stop react_container_01 && sudo docker rm react_container_01 &&  sudo docker pull registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest && sudo docker run -d -p 80:80 registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'"
+                // sh "cat /home/palash.manandhar/.ssh/id_rsa.pub"
+                // sh "hostname"
+                sh "ssh ${remoteUser}@${remoteServer} 'cd /home/yco.user/react-deployment && sudo docker stop react_container_01 && sudo docker rm react_container_01 &&  sudo docker pull registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest && sudo docker run -d -p 3000:3000 registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'"
             }
         }
 
