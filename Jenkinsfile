@@ -34,11 +34,9 @@ pipeline {
                 sh "ssh ${remoteUser}@${remoteServer} 'cd /home/lisadmin/react-deployment && sudo docker stop react_container_01 && sudo docker rm react_container_01 &&  sudo docker pull registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest && sudo docker run -d -p 80:80 registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'"
             }
         }
+
+      
     }
 
-  }
-  environment {
-    DOCKERHUB_USER = 'palashdm'
-    DOCKERHUB_PASSWORD = 'Silicon18v@lley'
   }
 }
