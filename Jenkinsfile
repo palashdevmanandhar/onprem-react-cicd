@@ -15,19 +15,13 @@ pipeline {
 
     stage('Docker Image Build') {
       steps {
-        sh 'sudo docker build -f Dockerfile . -t palashdm/onprem-react-cicd:latest'
-      }
-    }
-
-    stage('Login to DockerHub') {
-      steps {
-        sh 'docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD'
+        sh 'sudo docker build -f Dockerfile . -t registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'
       }
     }
 
     stage('Push to Dockerhub') {
       steps {
-        sh 'docker push palashdm/onprem-react-cicd:latest'
+        sh 'docker push registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'
       }
     }
 
