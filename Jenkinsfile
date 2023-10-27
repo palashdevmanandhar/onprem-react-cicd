@@ -19,6 +19,12 @@ pipeline {
       }
     }
 
+    stage('Docker Image Push') {
+      steps {
+        sh 'docker push registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'
+      }
+    }
+
     stage('SSH into Remote Server') {
       steps {
         script {
