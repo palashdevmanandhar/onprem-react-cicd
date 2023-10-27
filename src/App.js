@@ -7,7 +7,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload. new changes
+          Edit <code>src/App.js</code> and save to reload. App built every 15 minutes
         </p>
         <a
           className="App-link"
