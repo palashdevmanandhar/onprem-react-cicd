@@ -42,6 +42,7 @@ pipeline {
           sh "ssh ${remoteUser}@${remoteServer} 'cd /home/yco.user'"
           sh "ssh ${remoteUser}@${remoteServer} 'pwd'"
           sh "ssh ${remoteUser}@${remoteServer} 'ls -a'"
+          sh "ssh ${remoteUser}@${remoteServer} 'docker-compose down'"
           sh "ssh ${remoteUser}@${remoteServer} 'docker-compose -f docker-compose.yml up -d'"
         }
       }
