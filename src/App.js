@@ -1,7 +1,8 @@
 import logo from './logo.svg';
-import './App.css';
+import './App.css'
 
 function App() {
+  const testingEnvVariable = process.env.REACT_APP_TESTING_VARIABLE;
   return (
     <div className="App">
       <header className="App-header">
@@ -15,7 +16,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          Learn React: {testingEnvVariable}
         </a>
       </header>
     </div>

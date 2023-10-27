@@ -1,0 +1,122 @@
+version: '3.4'
+
+services:
+  nginx:
+    image: nginx:1.25.2
+    depends_on:
+      - frontend
+      - backend
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/certs:/etc/nginx/certs
+    ports:
+      - 80:80
+      - 443:443
+      - 8000:8000
+
+  database:
+    # Official Postgres image from DockerHub
+    image: 'postgres:15'
+
+    # By default, a Postgres database is running on the 5432 port.
+    # If we want to access the database from our computer (outside the container),
+    # we must share the port with our computer's port.
+    # The syntax is [port we want on our machine]:[port we want to retrieve in the container]
+    # Note: You are free to change your computer's port,
+    # but take into consideration that it will change the way
+    # you are connecting to your database.
+    ports:
+      - "5435:5432"
+    volumes:
+      - ${CONFIG}/pgdata/:/var/lib/postgresql/data
+
+    environment:
+      POSTGRES_USER: ${DB_USER} # The PostgreSQL user (useful to connect to the database)
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # The PostgreSQL password (useful to connect to the database)
+      POSTGRES_DB: ${DB_NAME} # The PostgreSQL default database (automatically created at first launch)
+      PGDATA: /var/lib/postgresql/data/pgdata
+    env_file: .env
+
+  backend:
+    image: ybp/backend:${TAG}
+    volumes:
+      - ./ai-backend/:/app #Synchronise docker container with local change.
+    build:
+      context: ./ai-backend/
+      dockerfile: Dockerfile
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+    command: bash -c "
+      sleep 7
+      && python manage.py makemigrations authuser
+      && python manage.py migrate
+      && python manage.py loaddata fixtures/screen.json
+      && python manage.py loaddata fixtures/permission.json
+      && python manage.py superuser
+      && python manage.py collectstatic --noinput
+      && gunicorn --bind 0.0.0.0:8000 core.wsgi & celery -A core worker -l INFO"
+    ports:
+      - 8002:8000
+    env_file: .env
+    depends_on:
+      - database
+
+  frontend:
+    image: frontend
+    build:
+      context: ./ai-frontend/
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: '0'
+    #   NODE_ENV: production
+    ports:
+      - 3000:3000
+    volumes:
+      - /app/node_modules
+
+    env_file:
+      - ./ai-frontend/.env
+
+    # depends_on:
+    #   - backend
+
+  vector_database:
+    # Official Postgres image from DockerHub
+    image: 'ankane/pgvector:latest'
+    ports:
+      - "5436:5432"
+    volumes:
+      - ${CONFIG}/pgvector_data/:/var/lib/postgresql/data
+
+    environment:
+      POSTGRES_USER: ${DB_USER} # The PostgreSQL user (useful to connect to the database)
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # The PostgreSQL password (useful to connect to the database)
+      POSTGRES_DB: ${DB_NAME} # The PostgreSQL default database (automatically created at first launch)
+      PGDATA: /var/lib/postgresql/data/pgdata
+    env_file: .env
+
+  pdf_service:
+    image: 'pdf_service'
+    volumes:
+      - ./ai-pdf-service:/app #Synchronise docker container with local change.
+    build:
+      context: ./ai-pdf-service/
+      dockerfile: Dockerfile
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+    command: bash -c "
+      sleep 10
+      && alembic upgrade head
+      && python main.py"
+    # ports:
+    #   - 8000:8000
+    env_file: ./ai-pdf-service/.env
+    depends_on:
+      - vector_database
+
+networks:
+  default:
+    external: false
+    driver: bridge
