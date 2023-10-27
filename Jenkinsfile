@@ -43,6 +43,8 @@ pipeline {
           sh "ssh ${remoteUser}@${remoteServer} 'pwd'"
           sh "ssh ${remoteUser}@${remoteServer} 'ls -a'"
           sh "ssh ${remoteUser}@${remoteServer} 'docker-compose down'"
+          sh "ssh ${remoteUser}@${remoteServer} 'docker rmi registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'"
+          sh "ssh ${remoteUser}@${remoteServer} 'docker pull registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'"
           sh "ssh ${remoteUser}@${remoteServer} 'docker-compose -f docker-compose.yml up -d'"
         }
       }
