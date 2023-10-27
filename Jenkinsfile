@@ -1,7 +1,7 @@
 pipeline {
   agent any
   triggers {
-    pollSCM '*/20 * * * *'
+    pollSCM '*/5 * * * *'
   }
   stages {
     stage('Checkout Code') {
@@ -34,11 +34,13 @@ pipeline {
           def remoteServer = '192.168.50.181'
           def remoteUser = 'yco.user'
 
-          sh "ssh ${remoteUser}@${remoteServer} 'docker stop react_container_01 && docker rm react_container_01'"
+          //sh "ssh ${remoteUser}@${remoteServer} 'docker stop react_container_01 && docker rm react_container_01'"
 
           // Pull the latest image and run the container
           //sh "ssh ${remoteUser}@${remoteServer} 'docker pull registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest && docker run -d --name react_container_01 -p 3000:3000 registry-inteliome.yco.com.np:5000/palashdm/onprem-react-cicd:latest'"
-
+          
+          sh "ssh ${remoteUser}@${remoteServer} 'cd /home/yco.user/react-deployment'"
+          sh "ssh ${remoteUser}@${remoteServer} 'docker-compose down && docker-compose up -d'"
         }
       }
     }
